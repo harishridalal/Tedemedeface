@@ -12,17 +12,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract a clean project from the uploaded ZIP
+      - name: Extract the v2 project ZIP
         shell: bash
         run: |
-          test -f FaceFilterOffline_Expanded.zip
+          set -euxo pipefail
+          test -f FaceFilterOffline_v2.zip
           rm -rf project
           mkdir -p project
-          unzip -oq FaceFilterOffline_Expanded.zip -d project
+          unzip -oq FaceFilterOffline_v2.zip -d project
           test -f project/settings.gradle
           test -f project/app/build.gradle
-          grep -q 'fun setFilter(filter: Filter)' project/app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
-          grep -q 'overlay.setFilter(filter)' project/app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
+          grep -q 'overlay.selectedFilter = filter' project/app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
+          grep -q 'var selectedFilter:' project/app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
