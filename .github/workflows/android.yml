@@ -12,18 +12,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract v4 source ZIP and verify matching files
+      - name: Extract v5 source ZIP and verify matching files
         shell: bash
         run: |
           set -euxo pipefail
-          test -f FaceFilterOffline_v4.zip
+          test -f FaceFilterOffline_v5.zip
           rm -rf project
           mkdir -p project
-          unzip -oq FaceFilterOffline_v4.zip -d project
+          unzip -oq FaceFilterOffline_v5.zip -d project
           test -f project/settings.gradle
           test -f project/app/build.gradle
-          grep -n 'overlay.selectedFilter = filter' project/app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
-          grep -n 'fun setActiveFilter(filter: Filter)' project/app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
+          grep -n 'overlay.applyFilter(filter)' project/app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
+          grep -n 'fun applyFilter(filter: Filter)' project/app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -61,11 +61,11 @@ jobs:
           echo "=== Repository commit ==="
           git -C .. rev-parse HEAD
           echo "=== MainActivity.kt: overlay declaration and method call ==="
-          grep -n -E 'FilterOverlayView|setActiveFilter' app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
+          grep -n -E 'FilterOverlayView|applyFilter' app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
           echo "=== FilterOverlayView.kt: class and filter methods ==="
-          grep -n -E 'class FilterOverlayView|fun setActiveFilter|selectedFilter' app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
-          echo "=== All Kotlin definitions of setActiveFilter ==="
-          grep -R -n --include='*.kt' 'fun setActiveFilter' app/src/main/java || true
+          grep -n -E 'class FilterOverlayView|fun applyFilter|selectedFilter' app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
+          echo "=== All Kotlin definitions of applyFilter ==="
+          grep -R -n --include='*.kt' 'fun applyFilter' app/src/main/java || true
           echo "=== Kotlin source files with same package/class names ==="
           grep -R -n --include='*.kt' -E '^package com\\.prateek\\.offlinefilters|class FilterOverlayView' app/src/main/java || true
 
