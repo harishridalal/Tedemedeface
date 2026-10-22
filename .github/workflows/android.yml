@@ -53,6 +53,22 @@ jobs:
             -o project/app/src/main/assets/face_landmarker.task
           test -s project/app/src/main/assets/face_landmarker.task
 
+      - name: Debug actual Kotlin source
+        working-directory: project
+        shell: bash
+        run: |
+          set -euxo pipefail
+          echo "=== Repository commit ==="
+          git -C .. rev-parse HEAD
+          echo "=== MainActivity.kt: overlay declaration and method call ==="
+          grep -n -E 'FilterOverlayView|setActiveFilter' app/src/main/java/com/prateek/offlinefilters/MainActivity.kt
+          echo "=== FilterOverlayView.kt: class and filter methods ==="
+          grep -n -E 'class FilterOverlayView|fun setActiveFilter|selectedFilter' app/src/main/java/com/prateek/offlinefilters/FilterOverlayView.kt
+          echo "=== All Kotlin definitions of setActiveFilter ==="
+          grep -R -n --include='*.kt' 'fun setActiveFilter' app/src/main/java || true
+          echo "=== Kotlin source files with same package/class names ==="
+          grep -R -n --include='*.kt' -E '^package com\\.prateek\\.offlinefilters|class FilterOverlayView' app/src/main/java || true
+
       - name: Build debug APK
         working-directory: project
         run: gradle --no-daemon assembleDebug
